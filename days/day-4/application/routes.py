@@ -1,21 +1,21 @@
 from flask import render_template, url_for, redirect, request
 from application import app, db
 from application.models import Todos
-from application.forms import TodoForm, OrderTodo
+from application.forms import TodoForm, OrderForm
 
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    form = OrderTodo()
+    form = OrderForm()
     totals = {
         "total": Todos.query.count(),
         "total_completed": Todos.query.filter_by(complete=True).count()
     }
-    if form.order_with.data == "id":
+    if form.order.data == "id":
         todos = Todos.query.order_by(Todos.id.desc()).all()
-    elif form.order_with.data == "complete":
+    elif form.order.data == "complete":
         todos = Todos.query.order_by(Todos.complete.desc()).all()
-    elif form.order_with.data == "incomplete":
+    elif form.order.data == "incomplete":
         todos = Todos.query.order_by(Todos.complete).all()
     else:
         todos = Todos.query.all()
@@ -55,6 +55,7 @@ def update(id):
     if form.validate_on_submit():
         todo.task = form.task.data
         db.session.commit()
+        return redirect(url_for('index'))
     elif request.method == 'GET':
         form.task.data = todo.task
     return render_template('update.html', title='Update your todo', form=form)
