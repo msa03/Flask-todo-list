@@ -11,9 +11,19 @@ class Todos(db.Model):
     task = db.Column(db.String(30), unique=True)
     completed = db.Column(db.Boolean, default=False)
 
+db.create_all()
+sample_todo= Todos(
+    task = "Sample todo",
+    completed = False
+)
+db.session.add(sample_todo)
+db.session.commit()
+
+
 @app.route('/')
 def index():
-    return "Todo App Home"
+    todo = Todos.query.first()
+    return todo.task
 
 @app.route('/add')
 def add():
